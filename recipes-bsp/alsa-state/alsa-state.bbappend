@@ -1,13 +1,9 @@
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
+PACKAGE_ARCH:tegra = "${MACHINE_ARCH}"
 
-PACKAGE_ARCH_tegra = "${MACHINE_ARCH}"
-
-do_install_append_tegra() {
+do_install:append:tegra() {
     rm ${D}${sysconfdir}/asound.conf
     rmdir ${D}${sysconfdir} 2>/dev/null || true
 }
 
-RCONFDEPS = ""
-RCONFDEPS_tegra = "tegra-configs-alsa"
-RDEPENDS_${PN} += "${RCONFDEPS}"
-ALLOW_EMPTY_${PN} = "1"
+RDEPENDS:${PN}:append:tegra = " tegra-configs-alsa"
+ALLOW_EMPTY:${PN}:tegra = "1"

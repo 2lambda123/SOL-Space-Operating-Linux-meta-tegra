@@ -3,43 +3,40 @@
 SOC_FAMILY = "tegra194"
 
 require conf/machine/include/soc-family.inc
-require conf/machine/include/arm/arch-armv8a.inc
+DEFAULTTUNE ?= "armv8a-crc"
+require conf/machine/include/arm/arch-armv8-2a.inc
 
-KERNEL_IMAGETYPE = "Image"
+INITRAMFS_IMAGE ?= "tegra-minimal-initramfs"
+INITRAMFS_IMAGE_BUNDLE ?= "0"
+INITRAMFS_FSTYPES:append = "${@'' if d.getVar('INITRAMFS_IMAGE_BUNDLE') == '1' else ' cpio.gz.cboot cpio.gz.cboot.bup-payload'}"
 
-MACHINE_FEATURES = "alsa usbhost pci rtc cuda"
-MACHINE_ESSENTIAL_EXTRA_RDEPENDS = "tegra-firmware kernel-devicetree kernel-image"
-MACHINE_EXTRA_RDEPENDS = "tegra-nvpmodel tegra-nvphs tegra-nvs-service tegra-configs-nvstartup tegra-configs-udev kernel-module-nvgpu"
+SERIAL_CONSOLES ?= "115200;ttyTCU0"
 
-INITRD_IMAGE ?=	"tegra-minimal-initramfs"
-IMAGE_CLASSES_append = " image_types_cboot"
-INITRD_FSTYPES ?= "cpio.gz.cboot cpio.gz.cboot.bup-payload"
-IMAGE_UBOOT ?= ""
-
-TEGRA_AUDIO_DEVICE ?= "tegrahdat194ref"
-
-SERIAL_CONSOLE = "115200 ttyTCU0"
-
-KERNEL_MODULE_AUTOLOAD = "nvgpu"
+KERNEL_MODULE_AUTOLOAD ?= "nvgpu tegra-udrm"
 
 NVIDIA_CHIP = "0x19"
 
-TEGRA_CHIPREV ?= "2"
-TEGRA_FAB ?= "400"
 TEGRA_BOARDID ?= "2888"
+TEGRA_FAB ?= "400"
 TEGRA_BOARDSKU ?= "0001"
 TEGRA_BOARDREV ?= "H.0"
+TEGRA_CHIPREV ?= "2"
 TEGRA_SIGNING_ENV = "CHIPREV=${TEGRA_CHIPREV} BOARDID=${TEGRA_BOARDID} FAB=${TEGRA_FAB} BOARDSKU=${TEGRA_BOARDSKU} BOARDREV=${TEGRA_BOARDREV}"
 
-DEB_PKG_EXTENSION = "arm64"
-
-CUDA_VERSION ?= "10.0"
-CUDA_NVCC_ARCH_FLAGS ?= "--gpu-architecture=compute_72 --gpu-code=sm_72"
-
-PREFERRED_PROVIDER_virtual/bootloader ?= "cboot-prebuilt"
-PREFERRED_PROVIDER_cboot ?= "cboot-prebuilt"
+TEGRA_CUDA_ARCHITECTURE = "72"
 
 require conf/machine/include/tegra-common.inc
 
-L4T_BSP_NAME = "TX2-AGX"
-L4T_BSP_PREFIX = "Tegra186"
+EFI_PROVIDER ?= "l4t-launcher"
+
+L4T_BSP_PREFIX = "Jetson"
+L4T_DEB_SOCNAME = "t194"
+
+NVPMODEL ?= "nvpmodel_t194"
+NVPOWER ?= "jetsonpower_t194"
+NVFANCONTROL ?= "nvfancontrol_p2888"
+
+MACHINE_EXTRA_RRECOMMENDS += "kernel-module-tegra-udrm"
+
+KERNEL_MODULE_PROBECONF += "tegra-udrm"
+module_conf_tegra-udrm = "options tegra-udrm modeset=1"

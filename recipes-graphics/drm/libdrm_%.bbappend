@@ -1,8 +1,10 @@
-RDEPENDS_${PN}_tegra = "libdrm-nvdc"
+DEPENDS:append:tegra = " libdrm-nvdc"
+RDEPENDS:${PN}:tegra = "libdrm-nvdc"
 
 # Ensure libdrm uses its helpers and doesn't call back into libdrm-nvdc
-LDFLAGS_append_tegra = " -Wl,-Bsymbolic-functions"
+LDFLAGS:append:tegra = " -Wl,-Bsymbolic-functions"
 
-do_install_append_tegra() {
-    sed -i -e 's|^Libs: .*|& -Wl,-rpath,${libdir}/tegra|g' ${D}${libdir}/pkgconfig/libdrm.pc
+pkg_postinst:${PN}:tegra() {
+    ln -sf libdrm_nvdc.so $D${libdir}/libdrm.so.2
 }
+PACKAGE_ARCH:tegra = "${TEGRA_PKGARCH}"
